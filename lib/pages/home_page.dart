@@ -1,11 +1,11 @@
 import 'dart:convert';
 import 'dart:core';
 
-import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/material.dart';
+import 'package:flutter_easyrefresh/ball_pulse_footer.dart';
+import 'package:flutter_easyrefresh/ball_pulse_header.dart';
+import 'package:flutter_easyrefresh/easy_refresh.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:flutter_shop/config/httpHeaders.dart';
 import 'package:flutter_shop/service/service_method.dart';
 import 'package:flutter_swiper/flutter_swiper.dart';
 import 'package:url_launcher/url_launcher.dart';
@@ -186,7 +186,8 @@ class _HomePageState extends State<HomePage> with AutomaticKeepAliveClientMixin 
   //   });
   //   super.initState();
   // }
-
+  int page = 1;
+  List<Map> hotGoodsList=[];
   @override
   void initState() {
     // TODO: implement initState
@@ -223,8 +224,8 @@ class _HomePageState extends State<HomePage> with AutomaticKeepAliveClientMixin 
              if (navigatorList.length > 10) {
                navigatorList.removeRange(10, navigatorList.length);
              }
-             return SingleChildScrollView(
-               child: Column(
+             return EasyRefresh(
+               child: ListView(
                 children: <Widget>[
                   SwiperDiy(swiperDataList: swiperDataList,),
                   TopNavigator(navigatorList: navigatorList),
@@ -236,9 +237,31 @@ class _HomePageState extends State<HomePage> with AutomaticKeepAliveClientMixin 
                   FloorTitle(pictureAddress:floor2Title),
                   FloorContent(floorGoodsList:floor2),
                   FloorTitle(pictureAddress:floor3Title),
-                  FloorContent(floorGoodsList:floor3)
+                  FloorContent(floorGoodsList:floor3),
+                  _hotGoods()
                 ],
               ),
+              header: BallPulseHeader(
+                color: Colors.pink
+              ),
+              footer: BallPulseFooter(
+                color: Colors.pink
+              ),
+              onRefresh: () async {
+                print('11111');
+              },
+              onLoad: ()async{
+                 print('开始加载更多$page');
+                  var formPage={'page': page};
+                  await  request('homePageBelowConten',formData:formPage).then((val){
+                    var data=json.decode(val.toString());
+                    List<Map> newGoodsList = (data['data'] as List ).cast();
+                    setState(() {
+                      hotGoodsList.addAll(newGoodsList);
+                      page++;
+                    });
+                  });
+                },
             );
           } else {
             return Center(
@@ -246,6 +269,75 @@ class _HomePageState extends State<HomePage> with AutomaticKeepAliveClientMixin 
             );
           }
         },
+      ),
+    );
+  }
+
+     // 火爆专区标题
+  Widget hotTitle = Container(
+    margin: EdgeInsets.only(top: 10.0),
+    padding:EdgeInsets.all(5.0),
+    alignment:Alignment.center,
+    decoration: BoxDecoration(
+      color: Colors.white,
+      border:Border(
+        bottom: BorderSide(width:0.5 ,color:Colors.black12)
+      )
+    ),
+    child: Text('火爆专区'),
+  );
+
+  // 火爆专区子项
+  Widget _wrapList() {
+    if (hotGoodsList.length!=0) {
+      List<Widget> listWidget = hotGoodsList.map((val) {
+        return InkWell(
+          onTap: () {print('点击了火爆商品');},
+          child: Container(
+            width: ScreenUtil().setWidth(372),
+            color: Colors.white,
+            padding: EdgeInsets.all(5.0),
+            margin: EdgeInsets.only(bottom: 3.0),
+            child: Column(
+              children: <Widget>[
+                  Image.network(val['image'],width: ScreenUtil().setWidth(375),),
+                  Text(
+                    val['name'],
+                    maxLines: 1,
+                    overflow:TextOverflow.ellipsis ,
+                    style: TextStyle(color:Colors.pink,fontSize: ScreenUtil().setSp(26)),
+                  ),
+                    Row(
+                    children: <Widget>[
+                      Text('￥${val['mallPrice']}'),
+                      Text(
+                        '￥${val['price']}',
+                        style: TextStyle(color:Colors.black26,decoration: TextDecoration.lineThrough),
+                      )
+                    ],
+                  )
+              ],
+            ),
+          )
+        );
+      }).toList();
+
+      return Wrap(
+        spacing: 2,
+        children: listWidget,
+      );
+    } else {
+      return Text(' ');
+    }
+  }
+
+  Widget _hotGoods() {
+    return Container(
+      child: Column(
+        children: <Widget>[
+          hotTitle,
+          _wrapList(),
+        ],
       ),
     );
   }
@@ -298,6 +390,7 @@ class TopNavigator extends StatelessWidget {
       height: ScreenUtil().setHeight(320),
       padding: EdgeInsets.all(3.0),
       child: GridView.count(
+        physics: NeverScrollableScrollPhysics(),
         crossAxisCount: 5,
         padding: EdgeInsets.all(4.0),
         children: navigatorList.map((item) {
@@ -336,7 +429,6 @@ class LeaderPhone extends StatelessWidget {
 
   void _launchURL() async {
     String url = 'tel:' + leaderPhone;
-    print(url);
     if (await canLaunch(url)) {
       await launch(url);
     } else {
@@ -482,7 +574,6 @@ class FloorContent extends StatelessWidget {
   }
 
   Widget _goodsItem(Map goods) {
-    print(goods);
     return Container(
       width: ScreenUtil().setWidth(375),
       child: InkWell(
