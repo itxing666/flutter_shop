@@ -86,7 +86,7 @@ class _LeftCategoryNavState extends State<LeftCategoryNav> {
       setState(() {
         list = category.data;
       });
-      Provide.value<ChildCategory>(context).getChildCategory( category.data[0].bxMallSubDto);
+      Provide.value<ChildCategory>(context).getChildCategory( category.data[0].bxMallSubDto, list[0].mallCategoryId);
     });
   }
 
@@ -100,7 +100,7 @@ class _LeftCategoryNavState extends State<LeftCategoryNav> {
         });
         var childList = list[index].bxMallSubDto;
         var categoryId = list[index].mallCategoryId;
-        Provide.value<ChildCategory>(context).getChildCategory(childList);
+        Provide.value<ChildCategory>(context).getChildCategory(childList, categoryId);
         _getGoodList(categoryId:categoryId);
       },
       child: Container(
@@ -142,7 +142,6 @@ class RightCategoryNav extends StatefulWidget {
 class _RightCategoryNavState extends State<RightCategoryNav> {
 
   // List list = ['名酒','宝丰','北京二锅头'];
-  int listIndex = 0; // 索引
   @override
   Widget build(BuildContext context) {
     return Container(
@@ -161,7 +160,7 @@ class _RightCategoryNavState extends State<RightCategoryNav> {
               scrollDirection: Axis.horizontal,
               itemCount: childCategory.childCategoryList.length,
               itemBuilder: (context, index){
-                return _rightInkWell(childCategory.childCategoryList[index]);
+                return _rightInkWell(index, childCategory.childCategoryList[index]);
               },
             )
           );
@@ -169,19 +168,19 @@ class _RightCategoryNavState extends State<RightCategoryNav> {
       )
     );
   }
-  Widget _rightInkWell(BxMallSubDto item){
-
+  Widget _rightInkWell(int index, BxMallSubDto item){
+    bool isCheck = false;
+    isCheck =(index==Provide.value<ChildCategory>(context).childIndex)?true:false;
     return InkWell(
       onTap: (){
-        // setState(() {
-        //   listIndex = index;
-        // });
+        Provide.value<ChildCategory>(context).changeChildIndex(index);
       },
       child: Container(
         padding:EdgeInsets.fromLTRB(5.0,10.0,5.0,10.0),
         child: Text(
           item.mallSubName,
-          style: TextStyle(fontSize:ScreenUtil().setSp(28)),
+          style: TextStyle(fontSize:ScreenUtil().setSp(28),
+          color: isCheck?Colors.pink:Colors.black ),
         ),
       ),
     );
