@@ -142,6 +142,7 @@ class RightCategoryNav extends StatefulWidget {
 class _RightCategoryNavState extends State<RightCategoryNav> {
 
   // List list = ['名酒','宝丰','北京二锅头'];
+  int listIndex = 0; // 索引
   @override
   Widget build(BuildContext context) {
     return Container(
@@ -171,7 +172,11 @@ class _RightCategoryNavState extends State<RightCategoryNav> {
   Widget _rightInkWell(BxMallSubDto item){
 
     return InkWell(
-      onTap: (){},
+      onTap: (){
+        // setState(() {
+        //   listIndex = index;
+        // });
+      },
       child: Container(
         padding:EdgeInsets.fromLTRB(5.0,10.0,5.0,10.0),
         child: Text(
@@ -201,16 +206,18 @@ class _CategoryGoodsListState extends State<CategoryGoodsList> {
   Widget build(BuildContext context) {
     return Provide<CategoryGoodsListProvide>(
       builder: (context,child,data) {
-        return Container(
+        return Expanded(
           child: Container(
-            width: ScreenUtil().setWidth(570),
-            height: ScreenUtil().setHeight(980),
-            child: ListView.builder(
-              itemCount: data.goodsList.length,
-              itemBuilder: (context,index){
-                return _listWidget(data.goodsList, index);
-              },
-            )
+            child: Container(
+              width: ScreenUtil().setWidth(570),
+              // height: ScreenUtil().setHeight(980),
+              child: ListView.builder(
+                itemCount: data.goodsList.length,
+                itemBuilder: (context,index){
+                  return _listWidget(data.goodsList, index);
+                },
+              )
+            ),
           ),
         );
       },
