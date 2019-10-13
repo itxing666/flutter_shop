@@ -59,14 +59,14 @@ class _IndexPageState extends State<IndexPage> {
   @override
   void initState() {
     currentPage = tabBodies[currentIndex];
-    // _pageController = new PageController()
-    // ..addListener(() {
-    //   if (currentPage != _pageController.page.round()) {
-    //     setState(() {
-    //       currentPage = _pageController.page.round();
-    //     });
-    //   }
-    // });
+    _pageController = new PageController()
+    ..addListener(() {
+      if (currentPage != _pageController.page.round()) {
+        setState(() {
+          currentPage = _pageController.page.round();
+        });
+      }
+    });
     super.initState();
   }
 

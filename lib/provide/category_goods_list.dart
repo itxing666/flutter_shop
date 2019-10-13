@@ -11,4 +11,9 @@ class CategoryGoodsListProvide with ChangeNotifier{
       goodsList=list;
       notifyListeners();
     }
+    //上拉加载列表
+    addGoodsList(List<CategoryListData> list){
+      goodsList.addAll(list);
+       notifyListeners();
+    }
 }
