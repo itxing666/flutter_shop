@@ -6,6 +6,7 @@ import 'package:flutter_easyrefresh/ball_pulse_footer.dart';
 import 'package:flutter_easyrefresh/ball_pulse_header.dart';
 import 'package:flutter_easyrefresh/easy_refresh.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:flutter_shop/routers/application.dart';
 import 'package:flutter_shop/service/service_method.dart';
 import 'package:flutter_swiper/flutter_swiper.dart';
 import 'package:url_launcher/url_launcher.dart';
@@ -292,7 +293,10 @@ class _HomePageState extends State<HomePage> with AutomaticKeepAliveClientMixin 
     if (hotGoodsList.length!=0) {
       List<Widget> listWidget = hotGoodsList.map((val) {
         return InkWell(
-          onTap: () {print('点击了火爆商品');},
+          onTap: () {
+            print('=============${val['goodsId'] is String}');
+            Application.router.navigateTo(context,"/detail?id=0}");
+          },
           child: Container(
             width: ScreenUtil().setWidth(372),
             color: Colors.white,
